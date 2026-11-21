@@ -1,0 +1,794 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Fred the Fat Cat</title>
+<meta name="description" content="In memory of Fred, a.k.a. Fat Cat. Photos, videos and memories from the family.">
+<meta property="og:title" content="Fred the Fat Cat">
+<meta property="og:description" content="In memory of Fred, a.k.a. Fat Cat. Photos, videos and memories from the family.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%233b2a1e'/%3E%3Ctext x='32' y='45' font-family='Georgia,serif' font-size='38' text-anchor='middle' fill='%23fff'%3EF%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Nunito+Sans:opsz,wght@6..12,400;6..12,600;6..12,700&display=swap">
+<script src="config.js"></script>
+<style>
+/* White paper, brown ink. Name, tally, framed-print photo wall, written memories, sign-off. */
+:root {
+  --bg: #ffffff;
+  --surface: #faf8f6;
+  --ink: #3b2a1e;
+  --muted: #7a6656;
+  --line: #e7e0d9;
+  --accent: #5e4330;
+  --accent-soft: #f1ebe5;
+  --danger: #9c2a1e;
+  --shade: rgba(20, 14, 10, .94);
+  --f-display: "Cormorant Garamond", Garamond, Georgia, "Times New Roman", serif;
+  --f-body: "Nunito Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --r: 4px;
+  color-scheme: light;
+}
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0; background: var(--bg); color: var(--ink);
+  font-family: var(--f-body); font-size: 16px; line-height: 1.55;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+img { max-width: 100%; }
+[hidden] { display: none !important; }
+.wrap { max-width: 1120px; margin: 0 auto; padding-block: 56px 72px; display: grid; grid-template-columns: minmax(0, 1fr); gap: 52px; }
+section { grid-template-columns: minmax(0, 1fr); }
+button, input, textarea { font: inherit; color: inherit; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+header.hero { display: grid; gap: 14px; border-bottom: 1px solid var(--line); padding-bottom: 36px; }
+.eyebrow { font-size: 12px; letter-spacing: .18em; text-transform: uppercase; color: var(--muted); font-weight: 700; }
+.name { display: flex; align-items: baseline; flex-wrap: wrap; gap: 6px 22px; }
+h1 { font-family: var(--f-display); font-weight: 500; font-size: clamp(72px, 14vw, 140px); line-height: .9; margin: 0; letter-spacing: -.01em; }
+.aka { font-family: var(--f-display); font-style: italic; font-weight: 500; font-size: clamp(28px, 5vw, 42px); color: var(--muted); line-height: 1; }
+.lede { max-width: 58ch; color: var(--muted); font-size: 18px; margin: 0; text-wrap: pretty; }
+.tally { display: flex; flex-wrap: wrap; gap: 8px 22px; font-variant-numeric: tabular-nums; color: var(--muted); font-size: 15px; }
+.tally b { color: var(--ink); font-weight: 700; }
+
+section { display: grid; gap: 20px; }
+.sec-head { display: flex; align-items: end; justify-content: space-between; flex-wrap: wrap; gap: 12px 20px; }
+h2 { font-family: var(--f-display); font-weight: 600; font-size: 34px; margin: 0; text-wrap: balance; }
+
+.btn {
+  display: inline-flex; align-items: center; gap: 8px; border: 0; cursor: pointer;
+  background: var(--ink); color: var(--bg); padding: 10px 20px; border-radius: var(--r); font-weight: 600; font-size: 14px; letter-spacing: .03em;
+}
+.btn:hover { background: var(--accent); }
+.btn.ghost { background: transparent; color: var(--ink); border: 1px solid var(--line); }
+.btn.ghost:hover { border-color: var(--ink); }
+.btn:disabled { opacity: .5; cursor: default; }
+.row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+.filters { display: flex; gap: 6px; flex-wrap: wrap; }
+.chip { border: 1px solid var(--line); background: transparent; border-radius: var(--r); padding: 6px 14px; cursor: pointer; font-size: 14px; font-weight: 600; color: var(--muted); }
+.chip[aria-pressed="true"] { background: var(--accent-soft); border-color: var(--accent); color: var(--ink); }
+
+.field { display: grid; gap: 4px; font-size: 13px; color: var(--muted); }
+.field input, .field textarea, .q-item input {
+  width: 100%; padding: 9px 12px; border: 1px solid var(--line); border-radius: var(--r); background: #fff; font-size: 15px; color: var(--ink);
+}
+.field textarea { min-height: 100px; resize: vertical; }
+
+.uploader { display: grid; gap: 14px; background: var(--surface); border: 1px dashed var(--line); border-radius: var(--r); padding: 20px; }
+.uploader.drag { border-color: var(--accent); background: var(--accent-soft); }
+.uploader p { margin: 0; color: var(--muted); font-size: 14px; max-width: 70ch; }
+.queue { display: grid; gap: 10px; }
+.q-item { display: grid; grid-template-columns: 64px minmax(0,1fr) auto; gap: 12px; align-items: center; }
+.q-thumb { width: 64px; height: 64px; border-radius: 2px; object-fit: cover; background: var(--line); }
+.q-meta { font-size: 13px; color: var(--muted); min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.q-state { font-size: 13px; font-weight: 700; color: var(--muted); max-width: 220px; text-align: right; }
+.q-state.err { color: var(--danger); }
+.x { border: 0; background: transparent; cursor: pointer; color: var(--muted); font-size: 22px; line-height: 1; padding: 4px 8px; }
+.name-field { max-width: 280px; }
+
+.wall { columns: 3 260px; column-gap: 28px; padding-top: 6px; }
+.tile {
+  break-inside: avoid; display: block; width: 100%; margin: 0 0 28px; padding: 12px 12px 4px; cursor: zoom-in; border: 0;
+  background: #fff; border-radius: 2px; position: relative; text-align: left;
+  box-shadow: 0 1px 2px rgba(59,42,30,.10), 0 8px 24px -8px rgba(59,42,30,.22);
+}
+.tile figure { margin: 0; }
+.tile figure::after { content: ""; display: block; height: 8px; }
+.media-box { position: relative; overflow: hidden; border-radius: 1px; background: var(--accent-soft); }
+.tile img { display: block; width: 100%; height: auto; }
+.tile figcaption { padding: 10px 2px 0; font-family: var(--f-display); font-style: italic; font-size: 19px; line-height: 1.3; color: var(--ink); text-align: center; }
+.tile figcaption:empty { display: none; }
+.tile:hover { box-shadow: 0 2px 4px rgba(59,42,30,.12), 0 18px 40px -12px rgba(59,42,30,.32); }
+.play {
+  position: absolute; top: 10px; left: 10px; background: var(--shade); color: #fff; border-radius: 999px;
+  font-size: 11px; font-weight: 700; padding: 4px 10px 4px 8px; display: inline-flex; gap: 6px; align-items: center; letter-spacing: .06em;
+}
+.play::before { content: ""; border-left: 8px solid #fff; border-top: 5px solid transparent; border-bottom: 5px solid transparent; }
+.hover-meta {
+  position: absolute; left: 0; right: 0; bottom: 0; padding: 28px 12px 10px; color: #fff; font-size: 13px; line-height: 1.4;
+  background: linear-gradient(to top, rgba(20,14,10,.85), rgba(20,14,10,0)); opacity: 0; pointer-events: none; display: grid; gap: 2px;
+}
+.hover-meta b { font-weight: 700; }
+.tile:hover .hover-meta, .tile:focus-visible .hover-meta { opacity: 1; }
+@media (hover: none) {
+  .hover-meta { position: static; opacity: 1; background: #fff; color: var(--muted); padding: 8px 2px 0; }
+  .hover-meta b { color: var(--ink); }
+}
+
+.empty { padding: 8px 10px 4px; overflow: hidden; text-align: center; display: grid; gap: 12px; justify-items: center; }
+.empty p { margin: 0; color: var(--muted); max-width: 50ch; }
+.frames { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 24px; width: 100%; max-width: 760px; margin: 8px 0 6px; }
+.frame { background: #fff; padding: 10px 10px 34px; box-shadow: 0 1px 2px rgba(59,42,30,.10), 0 8px 24px -8px rgba(59,42,30,.22); }
+.frame span { display: block; aspect-ratio: 4 / 5; background: var(--accent-soft); }
+.frame:nth-child(2) span { aspect-ratio: 1; }
+.frame:nth-child(1) { transform: rotate(-1.5deg); } .frame:nth-child(3) { transform: rotate(1.2deg); }
+@media (max-width: 560px) { .frame:nth-child(n+3) { display: none; } }
+.note { font-size: 14px; color: var(--muted); margin: 0; }
+.status { font-size: 14px; color: var(--muted); }
+.setup { border: 1px solid var(--line); background: var(--surface); padding: 18px 20px; border-radius: var(--r); font-size: 15px; }
+.setup code { font-size: 13px; background: #fff; border: 1px solid var(--line); padding: 1px 5px; border-radius: 3px; }
+
+.mem-form { display: grid; gap: 12px; max-width: 760px; }
+.memories { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; }
+.memory { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 20px 22px; display: grid; gap: 12px; align-content: start; min-width: 0; }
+.memory p { margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; font-family: var(--f-display); font-size: 21px; line-height: 1.35; }
+.memory .by { font-size: 13px; color: var(--muted); }
+
+.signoff {
+  font-family: var(--f-display); font-style: italic; font-weight: 500; color: var(--accent); font-size: clamp(34px, 6vw, 56px); line-height: 1.15;
+  text-align: center; padding-block: 40px 8px; border-top: 1px solid var(--line); text-wrap: balance;
+}
+
+dialog { border: 0; padding: 0; margin: 0; max-width: 100vw; max-height: 100vh; width: 100vw; height: 100%; overflow: hidden; }
+dialog.lb { background: var(--shade); color: #f3ede7; }
+dialog.lb::backdrop, dialog.ss::backdrop { background: #0d0a08; }
+.lb-inner { height: 100%; display: grid; grid-template-rows: auto minmax(0,1fr) auto; gap: 12px;
+  padding: max(12px, env(safe-area-inset-top, 0px)) max(16px, env(safe-area-inset-right, 0px)) max(16px, env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px)); }
+.lb-top { display: flex; justify-content: space-between; align-items: center; gap: 12px; font-size: 14px; color: #bcae9f; font-variant-numeric: tabular-nums; }
+.lb-stage { display: grid; grid-template-columns: auto minmax(0,1fr) auto; align-items: center; gap: 8px; min-height: 0; }
+.lb-media { display: grid; place-items: center; min-height: 0; height: 100%; }
+.lb-media img, .lb-media video { max-width: 100%; max-height: 100%; object-fit: contain; }
+.nav { border: 0; background: rgba(255,255,255,.1); color: #fff; width: 44px; height: 44px; border-radius: 50%; cursor: pointer; font-size: 20px; }
+.nav:hover { background: rgba(255,255,255,.2); }
+.nav:disabled { opacity: .25; cursor: default; }
+.lb-bottom { display: flex; justify-content: space-between; align-items: end; gap: 12px 20px; flex-wrap: wrap; }
+.cap { min-width: 0; max-width: 70ch; }
+.cap p { margin: 0; font-family: var(--f-display); font-style: italic; font-size: 24px; line-height: 1.25; overflow-wrap: anywhere; }
+.cap small { color: #bcae9f; font-size: 13px; }
+
+dialog.ss { background: #0d0a08; color: #f3ede7; }
+.ss-stage { position: absolute; inset: 0; }
+.ss-slide { position: absolute; inset: 0; display: grid; place-items: center; opacity: 0; transition: opacity 1.2s ease; padding: 4vh 4vw 120px; }
+.ss-slide.on { opacity: 1; }
+.ss-slide img, .ss-slide video { max-width: 100%; max-height: 100%; object-fit: contain; box-shadow: 0 20px 60px rgba(0,0,0,.5); }
+.ss-slide.on img { animation: kb 7s ease-out forwards; }
+@keyframes kb { from { transform: scale(1); } to { transform: scale(1.06); } }
+.ss-bar { position: absolute; left: 0; right: 0; bottom: 0; display: flex; justify-content: space-between; align-items: end; gap: 12px 20px; flex-wrap: wrap;
+  padding: 40px max(20px, env(safe-area-inset-right, 0px)) max(22px, env(safe-area-inset-bottom, 0px)) max(20px, env(safe-area-inset-left, 0px));
+  background: linear-gradient(to top, rgba(13,10,8,.9), rgba(13,10,8,0)); }
+.ss-ctrl { display: flex; gap: 8px; }
+.ss-progress { position: absolute; left: 0; right: 0; bottom: 0; height: 3px; background: rgba(255,255,255,.08); }
+.ss-progress span { display: block; height: 100%; width: 0; background: #d8c6b4; }
+
+@media (max-width: 560px) {
+  .wrap { padding-block: 32px 56px; gap: 40px; }
+  .lb-stage { grid-template-columns: minmax(0,1fr); }
+  .lb-stage .nav { display: none; }
+  .wall { column-gap: 18px; } .tile { margin-bottom: 18px; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .tile { transition: transform .2s ease, box-shadow .2s ease; }
+  .tile:hover { transform: translateY(-2px); }
+  .hover-meta { transition: opacity .18s ease; }
+}
+@media (prefers-reduced-motion: reduce) { .ss-slide { transition: none; } .ss-slide.on img { animation: none; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="hero">
+    <div class="eyebrow">In memory of</div>
+    <div class="name"><h1>Fred</h1><span class="aka">a.k.a. Fat Cat</span></div>
+    <p class="lede">Our cat, and a whole childhood in one big, round, lovable lump. This is where the family keeps every photo, video and story of him, so we never lose any of them.</p>
+    <div class="tally"><span><b id="n-photo">0</b> photos</span><span><b id="n-video">0</b> videos</span><span><b id="n-mem">0</b> memories</span></div>
+  </header>
+
+  <div class="setup" id="setup" hidden>
+    <strong>Almost ready.</strong> This site needs its photo storage connected. Open <code>config.js</code> and fill in the Cloudinary cloud name and upload preset, following <code>README.md</code>.
+  </div>
+
+  <section aria-labelledby="h-wall">
+    <div class="sec-head">
+      <h2 id="h-wall">Photos &amp; videos</h2>
+      <div class="row">
+        <div class="filters" role="group" aria-label="Show">
+          <button class="chip" data-f="all" aria-pressed="true">All</button>
+          <button class="chip" data-f="image" aria-pressed="false">Photos</button>
+          <button class="chip" data-f="video" aria-pressed="false">Videos</button>
+        </div>
+        <button class="btn ghost" id="ss-btn" hidden>&#9654;&#xFE0E; Play slideshow</button>
+        <button class="btn" id="add-btn">+ Add photos &amp; videos</button>
+      </div>
+    </div>
+
+    <div class="uploader" id="uploader" hidden>
+      <div class="row" style="justify-content:space-between;align-items:start">
+        <p>Pick photos or videos of Fred, or drag them here, and add a caption if you want. Any size photo works. Videos up to 100&nbsp;MB upload as they are; bigger ones get compressed first, which takes about as long as the video plays.</p>
+        <button class="x" id="up-close" aria-label="Close uploader">&times;</button>
+      </div>
+      <label class="field name-field" for="up-name">Your name
+        <input id="up-name" type="text" maxlength="60" placeholder="So everyone knows who added it" autocomplete="given-name">
+      </label>
+      <input type="file" id="file-in" accept="image/*,video/*" multiple hidden>
+      <div class="queue" id="queue"></div>
+      <div class="row">
+        <button class="btn ghost" id="pick-btn">Choose files</button>
+        <button class="btn" id="send-btn" disabled>Add to Fred's wall</button>
+      </div>
+    </div>
+
+    <div id="wall-status" class="status">Loading Fred's photos…</div>
+    <div class="wall" id="wall"></div>
+    <div class="empty" id="empty" hidden>
+      <div class="frames" aria-hidden="true"><div class="frame"><span></span></div><div class="frame"><span></span></div><div class="frame"><span></span></div></div>
+      <p id="empty-msg">No photos of Fred yet. Use “Add photos &amp; videos” to put the first one up.</p>
+    </div>
+  </section>
+
+  <section aria-labelledby="h-mem">
+    <div class="sec-head"><h2 id="h-mem">Memories of Fred</h2></div>
+    <form class="mem-form" id="mem-form">
+      <label class="field" for="mem-text">Write down something about him: a habit, a spot he always slept, the dumbest thing he ever did.
+        <textarea id="mem-text" maxlength="1000" placeholder="Fred used to…"></textarea>
+      </label>
+      <div class="row">
+        <label class="field name-field" for="mem-name" style="flex:1 1 200px">Your name
+          <input id="mem-name" type="text" maxlength="60" autocomplete="given-name">
+        </label>
+      </div>
+      <div class="row"><button class="btn" type="submit" id="mem-send">Add memory</button><span class="status" id="mem-status"></span></div>
+    </form>
+    <div class="memories" id="memories"></div>
+  </section>
+
+  <footer class="signoff">Forever and always, Fat Cat</footer>
+</div>
+
+<dialog class="lb" id="lb" aria-label="Photo viewer">
+  <div class="lb-inner">
+    <div class="lb-top"><span id="lb-count"></span><button class="nav" id="lb-close" aria-label="Close">&times;</button></div>
+    <div class="lb-stage">
+      <button class="nav" id="lb-prev" aria-label="Previous">&#8249;</button>
+      <div class="lb-media" id="lb-media"></div>
+      <button class="nav" id="lb-next" aria-label="Next">&#8250;</button>
+    </div>
+    <div class="lb-bottom"><div class="cap"><p id="lb-cap"></p><small id="lb-meta"></small></div></div>
+  </div>
+</dialog>
+
+<dialog class="ss" id="ss" aria-label="Slideshow of Fred">
+  <div class="ss-stage" id="ss-stage"></div>
+  <div class="ss-bar">
+    <div class="cap"><p id="ss-cap"></p><small id="ss-meta"></small></div>
+    <div class="ss-ctrl">
+      <button class="nav" id="ss-prev" aria-label="Previous">&#8249;</button>
+      <button class="nav" id="ss-pause" aria-label="Pause">&#10074;&#10074;</button>
+      <button class="nav" id="ss-next" aria-label="Next">&#8250;</button>
+      <button class="nav" id="ss-close" aria-label="Close slideshow">&times;</button>
+    </div>
+  </div>
+  <div class="ss-progress"><span id="ss-prog"></span></div>
+</dialog>
+
+<script>
+(() => {
+  const $ = (s) => document.querySelector(s);
+  const C = window.FRED_CONFIG || {};
+  const READY = !!(C.cloudName && C.uploadPreset);
+  const TAG = C.tag || "fred";
+  const MEM_TAG = TAG + "-memories";
+  const BASE = "https://res.cloudinary.com/" + encodeURIComponent(C.cloudName || "");
+  const API = "https://api.cloudinary.com/v1_1/" + encodeURIComponent(C.cloudName || "");
+  const IMG_MAX = 9.5 * 1048576;   // Cloudinary free plan: 10 MB per image
+  const VID_MAX = 99 * 1048576;    // Cloudinary free plan: 100 MB per video
+
+  const S = { media: [], memories: [], filter: "all", queue: [], open: -1, uploading: false };
+
+  /* ---------- storage helpers ---------- */
+  const store = {
+    get(k) { try { return localStorage.getItem(k) || ""; } catch { return ""; } },
+    set(k, v) { try { localStorage.setItem(k, v); } catch {} },
+  };
+  const savedName = store.get("fred-name");
+  $("#up-name").value = savedName; $("#mem-name").value = savedName;
+  ["#up-name", "#mem-name"].forEach((id) => $(id).addEventListener("change", (e) => {
+    const v = e.target.value.trim(); store.set("fred-name", v); $("#up-name").value = v; $("#mem-name").value = v;
+  }));
+
+  const pathOf = (m) => m.publicId.split("/").map(encodeURIComponent).join("/");
+  function imgUrl(m, w) { return `${BASE}/image/upload/f_auto,q_auto,c_limit,w_${w}/v${m.version}/${pathOf(m)}.${m.format}`; }
+  function vidUrl(m) { return `${BASE}/video/upload/q_auto/v${m.version}/${pathOf(m)}.mp4`; }
+  function vidOrig(m) { return `${BASE}/video/upload/v${m.version}/${pathOf(m)}.${m.format}`; }
+  function posterUrl(m) { return `${BASE}/video/upload/so_1,c_limit,w_900,q_auto/v${m.version}/${pathOf(m)}.jpg`; }
+  function makeVideo(m) {
+    const v = document.createElement("video");
+    v.src = vidUrl(m); v.poster = posterUrl(m); v.playsInline = true; v.preload = "metadata";
+    v.addEventListener("error", () => { if (!v.dataset.fb) { v.dataset.fb = "1"; v.src = vidOrig(m); } }, true);
+    return v;
+  }
+
+  const fmtDate = (ms) => { try { return new Date(ms).toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" }); } catch { return ""; } };
+  function takenText(m) {
+    const verb = m.kind === "video" ? "Filmed" : "Taken";
+    if (m.taken && m.takenSrc === "meta") return verb + " " + fmtDate(m.taken);
+    if (m.taken) return "File dated " + fmtDate(m.taken);
+    return "Date taken unknown";
+  }
+  const byName = (m) => m.by || "Someone";
+
+  function fromResource(r, kind) {
+    const c = (r.context && r.context.custom) || {};
+    return {
+      id: kind + ":" + r.public_id, kind, publicId: r.public_id, version: r.version, format: r.format,
+      w: r.width, h: r.height, at: Date.parse(r.created_at) || 0,
+      caption: c.caption || "", by: c.by || "", taken: Number(c.taken) || null, takenSrc: c.takenSrc || null, text: c.text || "",
+    };
+  }
+
+  async function fetchList(type, tag) {
+    const r = await fetch(`${BASE}/${type}/list/${encodeURIComponent(tag)}.json`, { cache: "no-store" });
+    if (r.status === 404) return [];
+    if (!r.ok) { const e = new Error("list " + r.status); e.status = r.status; throw e; }
+    const j = await r.json();
+    return j.resources || [];
+  }
+
+  async function load() {
+    if (!READY) {
+      $("#setup").hidden = false; $("#wall-status").textContent = ""; $("#add-btn").hidden = true; $("#mem-form").hidden = true;
+      renderWall(); renderMemories(); return;
+    }
+    try {
+      const [imgs, vids, mems] = await Promise.all([
+        fetchList("image", TAG), fetchList("video", TAG), fetchList("raw", MEM_TAG).catch(() => []),
+      ]);
+      const seen = new Set(S.media.map((m) => m.id));
+      const listed = [...imgs.map((r) => fromResource(r, "image")), ...vids.map((r) => fromResource(r, "video"))];
+      const listedIds = new Set(listed.map((m) => m.id));
+      S.media = [...listed, ...S.media.filter((m) => m.local && !listedIds.has(m.id))].sort((a, b) => b.at - a.at);
+      const memListed = mems.map((r) => fromResource(r, "memory"));
+      const memIds = new Set(memListed.map((m) => m.id));
+      S.memories = [...memListed, ...S.memories.filter((m) => m.local && !memIds.has(m.id))].sort((a, b) => b.at - a.at);
+      $("#wall-status").textContent = "";
+      void seen;
+    } catch (e) {
+      $("#wall-status").textContent = e.status === 401
+        ? "Photos can't be listed yet. In Cloudinary, turn off the “Resource list” restriction (see README.md)."
+        : "Couldn't load Fred's photos right now. Check your connection and reload.";
+    }
+    renderWall(); renderMemories();
+  }
+
+  /* ---------- wall ---------- */
+  const visible = () => S.filter === "all" ? S.media : S.media.filter((m) => m.kind === S.filter);
+  function renderTally() {
+    $("#n-photo").textContent = S.media.filter((m) => m.kind === "image").length;
+    $("#n-video").textContent = S.media.filter((m) => m.kind === "video").length;
+    $("#n-mem").textContent = S.memories.length;
+  }
+  function renderWall() {
+    renderTally();
+    $("#ss-btn").hidden = !S.media.length;
+    const wall = $("#wall"), list = visible();
+    const have = new Map([...wall.children].map((el) => [el.dataset.id, el]));
+    const frag = document.createDocumentFragment();
+    list.forEach((m, i) => {
+      let el = have.get(m.id);
+      if (!el) {
+        el = document.createElement("button"); el.className = "tile"; el.type = "button"; el.dataset.id = m.id;
+        const fig = document.createElement("figure");
+        const box = document.createElement("div"); box.className = "media-box";
+        const img = document.createElement("img");
+        img.loading = "lazy"; img.decoding = "async";
+        if (m.w && m.h) { img.width = m.w; img.height = m.h; img.style.aspectRatio = m.w + " / " + m.h; img.style.height = "auto"; }
+        img.src = m.kind === "video" ? posterUrl(m) : imgUrl(m, 900);
+        img.alt = m.caption || (m.kind === "video" ? "Video of Fred" : "Photo of Fred");
+        img.onerror = () => { img.style.minHeight = "160px"; };
+        box.appendChild(img);
+        if (m.kind === "video") { const b = document.createElement("span"); b.className = "play"; b.textContent = "VIDEO"; box.appendChild(b); }
+        const hm = document.createElement("div"); hm.className = "hover-meta"; box.appendChild(hm);
+        fig.appendChild(box);
+        const cap = document.createElement("figcaption"); fig.appendChild(cap);
+        el.appendChild(fig);
+      }
+      el.querySelector("figcaption").textContent = m.caption || "";
+      const l1 = document.createElement("span"); l1.append("Uploaded by "); const b = document.createElement("b"); b.textContent = byName(m); l1.append(b);
+      const l2 = document.createElement("span"); l2.textContent = takenText(m);
+      el.querySelector(".hover-meta").replaceChildren(l1, l2);
+      el.setAttribute("aria-label", (m.kind === "video" ? "Video" : "Photo") + (m.caption ? ": " + m.caption : "") + ". Uploaded by " + byName(m) + ". " + takenText(m));
+      el.onclick = () => openLightbox(i);
+      frag.appendChild(el);
+    });
+    wall.replaceChildren(frag);
+    const isEmpty = !list.length;
+    $("#empty").hidden = !isEmpty || $("#wall-status").textContent !== "";
+    $("#empty-msg").textContent = S.media.length && isEmpty
+      ? (S.filter === "video" ? "No videos yet." : "No photos yet.")
+      : (READY ? "No photos of Fred yet. Use “Add photos & videos” to put the first one up." : "Photos will show up here once storage is connected.");
+  }
+  document.querySelectorAll(".chip").forEach((c) => c.addEventListener("click", () => {
+    S.filter = c.dataset.f;
+    document.querySelectorAll(".chip").forEach((x) => x.setAttribute("aria-pressed", String(x === c)));
+    renderWall();
+  }));
+
+  /* ---------- lightbox ---------- */
+  const lb = $("#lb");
+  function openLightbox(i) { S.open = i; renderLightbox(); if (!lb.open) lb.showModal(); }
+  function closeLightbox() { if (lb.open) lb.close(); }
+  function step(d) { const n = visible().length; const j = S.open + d; if (j < 0 || j >= n) return; S.open = j; renderLightbox(); }
+  function renderLightbox() {
+    const list = visible();
+    if (S.open < 0 || !list.length) return;
+    const m = list[Math.min(S.open, list.length - 1)];
+    const box = $("#lb-media");
+    if (box.dataset.id !== m.id) {
+      box.dataset.id = m.id;
+      let el;
+      if (m.kind === "video") { el = makeVideo(m); el.controls = true; }
+      else { el = document.createElement("img"); el.src = imgUrl(m, 2400); el.alt = m.caption || "Photo of Fred"; }
+      box.replaceChildren(el);
+    }
+    $("#lb-count").textContent = (S.open + 1) + " of " + list.length;
+    $("#lb-cap").textContent = m.caption || "";
+    $("#lb-meta").textContent = takenText(m) + " · Uploaded by " + byName(m) + (m.at ? " on " + fmtDate(m.at) : "");
+    $("#lb-prev").disabled = S.open === 0;
+    $("#lb-next").disabled = S.open === list.length - 1;
+  }
+  $("#lb-close").onclick = closeLightbox;
+  $("#lb-prev").onclick = () => step(-1);
+  $("#lb-next").onclick = () => step(1);
+  lb.addEventListener("close", () => { S.open = -1; const b = $("#lb-media"); b.replaceChildren(); b.dataset.id = ""; });
+  lb.addEventListener("click", (e) => { if (e.target === lb || e.target.id === "lb-media") closeLightbox(); });
+  let tx = null;
+  lb.addEventListener("touchstart", (e) => { tx = e.touches[0].clientX; }, { passive: true });
+  lb.addEventListener("touchend", (e) => { if (tx == null) return; const dx = e.changedTouches[0].clientX - tx; if (Math.abs(dx) > 50) step(dx < 0 ? 1 : -1); tx = null; });
+
+  /* ---------- slideshow ---------- */
+  const ss = $("#ss");
+  const SS = { list: [], i: 0, playing: true, timer: null, raf: 0, dur: 6000, lock: null };
+  $("#ss-btn").onclick = () => {
+    SS.list = S.media.slice().sort((a, b) => (a.taken || a.at) - (b.taken || b.at));
+    if (!SS.list.length) return;
+    SS.i = 0; SS.playing = true; setPauseIcon();
+    $("#ss-stage").replaceChildren(); ss.showModal();
+    try { ss.requestFullscreen?.().catch(() => {}); } catch {}
+    try { navigator.wakeLock?.request("screen").then((l) => { SS.lock = l; }).catch(() => {}); } catch {}
+    showSlide();
+  };
+  function stopShow() {
+    clearTimeout(SS.timer); cancelAnimationFrame(SS.raf);
+    $("#ss-stage").replaceChildren();
+    try { SS.lock?.release(); } catch {} SS.lock = null;
+    try { if (document.fullscreenElement) document.exitFullscreen().catch(() => {}); } catch {}
+    if (ss.open) ss.close();
+  }
+  function showSlide() {
+    clearTimeout(SS.timer); cancelAnimationFrame(SS.raf);
+    const m = SS.list[SS.i], stage = $("#ss-stage");
+    const slide = document.createElement("div"); slide.className = "ss-slide";
+    let el;
+    if (m.kind === "video") {
+      el = makeVideo(m); el.autoplay = true;
+      el.onended = () => { if (SS.playing) go(1); };
+    } else { el = document.createElement("img"); el.src = imgUrl(m, 2400); el.alt = m.caption || "Photo of Fred"; }
+    slide.appendChild(el); stage.appendChild(slide);
+    requestAnimationFrame(() => requestAnimationFrame(() => slide.classList.add("on")));
+    [...stage.children].slice(0, -1).forEach((o) => { o.classList.remove("on"); o.querySelector("video")?.pause(); setTimeout(() => o.remove(), 1300); });
+    $("#ss-cap").textContent = m.caption || "";
+    $("#ss-meta").textContent = takenText(m) + " · " + (SS.i + 1) + " of " + SS.list.length;
+    $("#ss-prog").style.width = "0";
+    if (m.kind !== "video" && SS.playing) {
+      const t0 = performance.now();
+      SS.timer = setTimeout(() => go(1), SS.dur);
+      const tick = () => { const p = Math.min(1, (performance.now() - t0) / SS.dur); $("#ss-prog").style.width = p * 100 + "%"; if (p < 1) SS.raf = requestAnimationFrame(tick); };
+      SS.raf = requestAnimationFrame(tick);
+    }
+  }
+  function go(d) { SS.i = (SS.i + d + SS.list.length) % SS.list.length; showSlide(); }
+  function setPauseIcon() { $("#ss-pause").innerHTML = SS.playing ? "&#10074;&#10074;" : "&#9654;&#xFE0E;"; $("#ss-pause").setAttribute("aria-label", SS.playing ? "Pause" : "Play"); }
+  function togglePause() {
+    SS.playing = !SS.playing; setPauseIcon();
+    const v = $("#ss-stage .ss-slide:last-child video");
+    if (v) { SS.playing ? v.play().catch(() => {}) : v.pause(); return; }
+    if (SS.playing) showSlide(); else { clearTimeout(SS.timer); cancelAnimationFrame(SS.raf); }
+  }
+  $("#ss-prev").onclick = () => go(-1);
+  $("#ss-next").onclick = () => go(1);
+  $("#ss-pause").onclick = togglePause;
+  $("#ss-close").onclick = stopShow;
+  ss.addEventListener("close", () => { if ($("#ss-stage").children.length) stopShow(); });
+
+  document.addEventListener("keydown", (e) => {
+    if (ss.open) {
+      if (e.key === "ArrowLeft") go(-1); else if (e.key === "ArrowRight") go(1);
+      else if (e.key === " ") { e.preventDefault(); togglePause(); }
+    } else if (lb.open) {
+      if (e.key === "ArrowLeft") step(-1); else if (e.key === "ArrowRight") step(1);
+    }
+  });
+
+  /* ---------- date taken ---------- */
+  async function exifDate(file) {
+    try {
+      const buf = new DataView(await file.slice(0, 256 * 1024).arrayBuffer());
+      if (buf.getUint16(0) !== 0xFFD8) return null;
+      let p = 2;
+      while (p + 4 < buf.byteLength) {
+        const marker = buf.getUint16(p), len = buf.getUint16(p + 2);
+        if (marker === 0xFFE1 && buf.getUint32(p + 4) === 0x45786966) {
+          const t = p + 10, le = buf.getUint16(t) === 0x4949;
+          const u16 = (o) => buf.getUint16(t + o, le), u32 = (o) => buf.getUint32(t + o, le);
+          const find = (off, want) => { const n = u16(off); for (let i = 0; i < n; i++) { const e = off + 2 + i * 12; if (u16(e) === want) return e; } return -1; };
+          const ifd0 = u32(4); let at = null;
+          const sub = find(ifd0, 0x8769);
+          if (sub >= 0) { const e = find(u32(sub + 8), 0x9003); if (e >= 0) at = u32(e + 8); }
+          if (at == null) { const e = find(ifd0, 0x0132); if (e >= 0) at = u32(e + 8); }
+          if (at == null) return null;
+          let s = ""; for (let i = 0; i < 19; i++) s += String.fromCharCode(buf.getUint8(t + at + i));
+          const mt = s.match(/^(\d{4}):(\d{2}):(\d{2}) (\d{2}):(\d{2}):(\d{2})/);
+          if (!mt || mt[1] === "0000") return null;
+          return new Date(+mt[1], +mt[2] - 1, +mt[3], +mt[4], +mt[5], +mt[6]).getTime();
+        }
+        if ((marker & 0xFF00) !== 0xFF00) return null;
+        p += 2 + len;
+      }
+    } catch {}
+    return null;
+  }
+  async function videoDate(file) {
+    const CH = 4 * 1048576;
+    const parts = [file.slice(0, CH)]; if (file.size > CH) parts.push(file.slice(Math.max(CH, file.size - CH)));
+    for (const part of parts) {
+      try {
+        const b = new Uint8Array(await part.arrayBuffer()), dv = new DataView(b.buffer);
+        for (let i = 0; i + 20 < b.length; i++) {
+          if (b[i] === 0x6d && b[i + 1] === 0x76 && b[i + 2] === 0x68 && b[i + 3] === 0x64) {
+            const secs = b[i + 4] === 1 ? Number(dv.getBigUint64(i + 8)) : dv.getUint32(i + 8);
+            const ms = (secs - 2082844800) * 1000;
+            return ms > Date.UTC(1995, 0, 1) && ms < Date.now() + 864e5 ? ms : null;
+          }
+        }
+      } catch {}
+    }
+    return null;
+  }
+  async function dateTaken(item) {
+    const meta = item.kind === "video" ? await videoDate(item.file) : await exifDate(item.file);
+    if (meta) return { taken: meta, takenSrc: "meta" };
+    return item.file.lastModified ? { taken: item.file.lastModified, takenSrc: "file" } : { taken: null, takenSrc: null };
+  }
+
+  /* ---------- shrinking / compressing ---------- */
+  async function shrink(file) {
+    if (file.type === "image/gif") return file;
+    let bmp;
+    try { bmp = await createImageBitmap(file, { imageOrientation: "from-image" }); }
+    catch { return file; } // e.g. HEIC on Windows: Cloudinary can still take it if it's small enough
+    const LIM = 2400, big = Math.max(bmp.width, bmp.height);
+    if (big <= LIM && file.size < 4 * 1048576) { bmp.close?.(); return file; }
+    const k = Math.min(1, LIM / big);
+    const c = document.createElement("canvas"); c.width = Math.round(bmp.width * k); c.height = Math.round(bmp.height * k);
+    c.getContext("2d").drawImage(bmp, 0, 0, c.width, c.height); bmp.close?.();
+    const blob = await new Promise((r) => c.toBlob(r, "image/jpeg", 0.9));
+    return blob || file;
+  }
+
+  async function compressVideo(file, onProg) {
+    if (!window.MediaRecorder) throw { code: "no_compress" };
+    const url = URL.createObjectURL(file);
+    const v = document.createElement("video"); v.src = url; v.playsInline = true; v.preload = "auto";
+    try {
+      await new Promise((res, rej) => { v.onloadedmetadata = res; v.onerror = () => rej({ code: "cant_read" }); });
+      const dur = v.duration;
+      if (!isFinite(dur) || dur <= 0 || !v.videoWidth) throw { code: "cant_read" };
+      const budget = 94 * 1048576 * 8, aBps = 96000;
+      const vBps = Math.min(5000000, budget / dur - aBps);
+      if (vBps < 250000) throw { code: "too_long" };
+      const long = vBps > 3500000 ? 1920 : vBps > 1500000 ? 1280 : vBps > 700000 ? 854 : 640;
+      const k = Math.min(1, long / Math.max(v.videoWidth, v.videoHeight));
+      const c = document.createElement("canvas");
+      c.width = Math.max(2, Math.round(v.videoWidth * k / 2) * 2); c.height = Math.max(2, Math.round(v.videoHeight * k / 2) * 2);
+      const ctx = c.getContext("2d");
+      const tracks = [...c.captureStream(30).getVideoTracks()];
+      let ac = null;
+      try { ac = new AudioContext(); const dst = ac.createMediaStreamDestination(); ac.createMediaElementSource(v).connect(dst); tracks.push(...dst.stream.getAudioTracks()); } catch { ac = null; }
+      const mime = ["video/mp4;codecs=avc1,mp4a", "video/webm;codecs=vp9,opus", "video/webm;codecs=vp8,opus", "video/webm", "video/mp4"].find((t) => MediaRecorder.isTypeSupported(t));
+      if (!mime) throw { code: "no_compress" };
+      const rec = new MediaRecorder(new MediaStream(tracks), { mimeType: mime, videoBitsPerSecond: Math.round(vBps), audioBitsPerSecond: aBps });
+      const chunks = []; rec.ondataavailable = (e) => { if (e.data && e.data.size) chunks.push(e.data); };
+      const stopped = new Promise((r) => { rec.onstop = r; });
+      const ended = new Promise((r, rej) => { v.onended = r; v.onerror = () => rej({ code: "cant_read" }); });
+      let running = true;
+      const draw = () => { if (!running) return; ctx.drawImage(v, 0, 0, c.width, c.height); onProg(Math.min(1, v.currentTime / dur));
+        if (v.requestVideoFrameCallback) v.requestVideoFrameCallback(draw); else requestAnimationFrame(draw); };
+      rec.start(1000);
+      if (ac) await ac.resume().catch(() => {});
+      try { await v.play(); } catch { if (!ac) { v.muted = true; await v.play(); } else throw { code: "cant_read" }; }
+      draw(); await ended;
+      running = false; rec.stop(); await stopped;
+      tracks.forEach((t) => t.stop()); if (ac) ac.close().catch(() => {});
+      const blob = new Blob(chunks, { type: mime.startsWith("video/mp4") ? "video/mp4" : "video/webm" });
+      if (!blob.size) throw { code: "cant_read" };
+      if (blob.size > VID_MAX) throw { code: "too_large" };
+      return blob;
+    } finally { v.pause(); v.removeAttribute("src"); v.load(); URL.revokeObjectURL(url); }
+  }
+
+  /* ---------- upload to Cloudinary ---------- */
+  const esc = (v) => String(v).replace(/[\u0000-\u0009\u000B-\u001F]/g, " ").replace(/[\\|=]/g, (c) => "\\" + c);
+  function contextString(obj) {
+    return Object.entries(obj).filter(([, v]) => v !== null && v !== undefined && String(v).trim() !== "")
+      .map(([k, v]) => k + "=" + esc(String(v).slice(0, 1000))).join("|");
+  }
+  function cloudUpload(blob, filename, resourceType, tags, ctx, onProg) {
+    return new Promise((resolve, reject) => {
+      const fd = new FormData();
+      fd.append("file", blob, filename);
+      fd.append("upload_preset", C.uploadPreset);
+      fd.append("tags", tags);
+      const cs = contextString(ctx); if (cs) fd.append("context", cs);
+      const x = new XMLHttpRequest();
+      x.open("POST", `${API}/${resourceType}/upload`);
+      x.upload.onprogress = (e) => { if (e.lengthComputable && onProg) onProg(e.loaded / e.total); };
+      x.onload = () => {
+        let j = null; try { j = JSON.parse(x.responseText); } catch {}
+        if (x.status >= 200 && x.status < 300 && j) resolve(j);
+        else reject({ code: "upload", message: (j && j.error && j.error.message) || ("error " + x.status) });
+      };
+      x.onerror = () => reject({ code: "network" });
+      x.send(fd);
+    });
+  }
+  function errText(e) {
+    const c = e && e.code;
+    if (c === "too_long") return "Too long to fit, even compressed. Trim it to under about 40 minutes.";
+    if (c === "too_large") return "Still too big after shrinking";
+    if (c === "cant_read") return "This browser can't read that video. Try Chrome, or convert it to MP4.";
+    if (c === "no_compress") return "Too big, and this browser can't shrink videos. Try Chrome or Edge.";
+    if (c === "network") return "Upload failed. Check your connection and try again.";
+    if (c === "upload") return "Upload refused: " + e.message;
+    return "Something went wrong. Try again.";
+  }
+
+  /* ---------- uploader UI ---------- */
+  const up = $("#uploader"), fileIn = $("#file-in");
+  $("#add-btn").onclick = () => { up.hidden = false; fileIn.click(); };
+  $("#pick-btn").onclick = () => fileIn.click();
+  $("#up-close").onclick = () => { if (S.uploading) return; S.queue.forEach((q) => URL.revokeObjectURL(q.preview)); S.queue = []; renderQueue(); up.hidden = true; };
+  fileIn.onchange = () => { addFiles(fileIn.files); fileIn.value = ""; };
+  ["dragenter", "dragover"].forEach((t) => up.addEventListener(t, (e) => { e.preventDefault(); up.classList.add("drag"); }));
+  ["dragleave", "drop"].forEach((t) => up.addEventListener(t, (e) => { e.preventDefault(); up.classList.remove("drag"); }));
+  up.addEventListener("drop", (e) => addFiles(e.dataTransfer.files));
+  document.addEventListener("dragover", (e) => { if (READY && e.dataTransfer && [...e.dataTransfer.types].includes("Files")) up.hidden = false; });
+
+  function addFiles(files) {
+    [...files].forEach((f) => {
+      const isV = f.type.startsWith("video/"), isI = f.type.startsWith("image/") || /\.(heic|heif)$/i.test(f.name);
+      const item = { file: f, caption: "", kind: isV ? "video" : "image", state: "ready", msg: "", preview: URL.createObjectURL(f) };
+      if (!isV && !isI) { item.state = "err"; item.msg = "Not a photo or video"; }
+      else if (isV && f.size > VID_MAX && !window.MediaRecorder) { item.state = "err"; item.msg = errText({ code: "no_compress" }); }
+      S.queue.push(item);
+    });
+    renderQueue();
+  }
+
+  function renderQueue() {
+    $("#queue").replaceChildren(...S.queue.map((item, i) => {
+      const row = document.createElement("div"); row.className = "q-item";
+      let th;
+      if (item.kind === "video") { th = document.createElement("video"); th.src = item.preview + "#t=0.5"; th.muted = true; th.preload = "metadata"; }
+      else { th = document.createElement("img"); th.src = item.preview; th.alt = ""; }
+      th.className = "q-thumb";
+      const mid = document.createElement("div"); mid.style.cssText = "display:grid;gap:4px;min-width:0";
+      const inp = document.createElement("input"); inp.type = "text"; inp.id = "cap-" + i; inp.maxLength = 280;
+      inp.placeholder = "Caption (optional)"; inp.value = item.caption; inp.disabled = item.state !== "ready";
+      inp.setAttribute("aria-label", "Caption for " + item.file.name);
+      inp.oninput = () => { item.caption = inp.value; };
+      const meta = document.createElement("div"); meta.className = "q-meta";
+      meta.textContent = item.file.name + " · " + (item.file.size / 1048576).toFixed(1) + " MB" +
+        (item.kind === "video" && item.file.size > VID_MAX && item.state === "ready" ? " · will be compressed to fit" : "");
+      mid.append(inp, meta);
+      const st = document.createElement("div");
+      if (item.state === "ready") {
+        const x = document.createElement("button"); x.className = "x"; x.type = "button"; x.textContent = "×";
+        x.setAttribute("aria-label", "Remove " + item.file.name); x.disabled = S.uploading;
+        x.onclick = () => { URL.revokeObjectURL(item.preview); S.queue.splice(i, 1); renderQueue(); };
+        st.appendChild(x);
+      } else {
+        st.className = "q-state" + (item.state === "err" ? " err" : "");
+        st.textContent = item.state === "done" ? "Added" : item.msg;
+      }
+      row.append(th, mid, st);
+      return row;
+    }));
+    const n = S.queue.filter((x) => x.state === "ready").length;
+    const btn = $("#send-btn");
+    btn.disabled = !n || S.uploading;
+    btn.textContent = S.uploading ? "Uploading…" : n > 1 ? `Add ${n} to Fred's wall` : "Add to Fred's wall";
+  }
+
+  $("#send-btn").onclick = async () => {
+    if (!READY || S.uploading) return;
+    const by = $("#up-name").value.trim(); store.set("fred-name", by); $("#mem-name").value = by;
+    S.uploading = true; renderQueue();
+    for (const item of S.queue) {
+      if (item.state !== "ready") continue;
+      item.state = "busy"; item.msg = "Preparing…"; renderQueue();
+      try {
+        const when = await dateTaken(item);
+        let blob = item.file, name = item.file.name;
+        if (item.kind === "image") {
+          blob = await shrink(item.file);
+          if (blob !== item.file) name = name.replace(/\.[^.]+$/, "") + ".jpg";
+          if (blob.size > IMG_MAX) throw { code: "too_large" };
+        } else if (item.file.size > VID_MAX) {
+          let last = -1;
+          blob = await compressVideo(item.file, (p) => { const pct = Math.floor(p * 100); if (pct !== last) { last = pct; item.msg = "Compressing " + pct + "% (keep this tab open)"; renderQueue(); } });
+          name = name.replace(/\.[^.]+$/, "") + (blob.type === "video/mp4" ? ".mp4" : ".webm");
+        }
+        let lastU = -1;
+        const res = await cloudUpload(blob, name, item.kind, TAG,
+          { caption: item.caption.trim(), by, taken: when.taken, takenSrc: when.takenSrc },
+          (p) => { const pct = Math.floor(p * 100); if (pct !== lastU) { lastU = pct; item.msg = "Uploading " + pct + "%"; renderQueue(); } });
+        const m = fromResource({ ...res, context: { custom: { caption: item.caption.trim(), by, taken: when.taken, takenSrc: when.takenSrc } } }, item.kind);
+        m.local = true;
+        S.media = [m, ...S.media.filter((x) => x.id !== m.id)];
+        renderWall();
+        item.state = "done";
+      } catch (e) { item.state = "err"; item.msg = errText(e); }
+      renderQueue();
+    }
+    S.uploading = false;
+    S.queue = S.queue.filter((x) => { if (x.state === "done") { URL.revokeObjectURL(x.preview); return false; } return true; });
+    renderQueue();
+    if (!S.queue.length) up.hidden = true;
+  };
+
+  /* ---------- memories ---------- */
+  function renderMemories() {
+    renderTally();
+    const box = $("#memories");
+    if (!S.memories.length) {
+      const p = document.createElement("p"); p.className = "note"; p.textContent = READY ? "No memories written yet. Be the first to write one." : "";
+      box.replaceChildren(p); return;
+    }
+    box.replaceChildren(...S.memories.map((m) => {
+      const card = document.createElement("article"); card.className = "memory";
+      const p = document.createElement("p"); p.textContent = m.text;
+      const by = document.createElement("div"); by.className = "by"; by.textContent = "— " + byName(m) + (m.at ? ", " + fmtDate(m.at) : "");
+      card.append(p, by); return card;
+    }));
+  }
+  $("#mem-form").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const text = $("#mem-text").value.trim(); if (!text || !READY) return;
+    const by = $("#mem-name").value.trim(); store.set("fred-name", by); $("#up-name").value = by;
+    const btn = $("#mem-send"); btn.disabled = true; $("#mem-status").textContent = "Saving…";
+    try {
+      const res = await cloudUpload(new Blob([text], { type: "text/plain" }), "memory.txt", "raw", MEM_TAG, { text, by });
+      const m = fromResource({ ...res, context: { custom: { text, by } } }, "memory"); m.local = true;
+      S.memories = [m, ...S.memories]; renderMemories();
+      $("#mem-text").value = ""; $("#mem-status").textContent = "Saved. Thank you.";
+    } catch (err) { $("#mem-status").textContent = errText(err); }
+    btn.disabled = false;
+  });
+
+  renderWall(); renderMemories();
+  load();
+})();
+</script>
+</body>
+</html>
